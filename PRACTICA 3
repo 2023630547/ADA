@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Mapeo de dígitos a letras
+const char *letters[] = {
+    "",     // 0
+    "",     // 1
+    "abc",  // 2
+    "def",  // 3
+    "ghi",  // 4
+    "jkl",  // 5
+    "mno",  // 6
+    "pqrs", // 7
+    "tuv",  // 8
+    "wxyz"  // 9
+};
+
+// Función para generar combinaciones
+void backtrack(char **result, char *current, const char *digits, int index, int *returnSize) {
+    if (index == strlen(digits)) {
+        result[*returnSize] = (char *)malloc((strlen(current) + 1) * sizeof(char));
+        strcpy(result[*returnSize], current);
+        (*returnSize)++;
+        return;
+    }
+
+    int digit = digits[index] - '0';
+    const char *possible_letters = letters[digit];
+
+    for (int i = 0; i < strlen(possible_letters); i++) {
+        current[index] = possible_letters[i];
+        current[index + 1] = '\0';
+        backtrack(result, current, digits, index + 1, returnSize);
+    }
+}
+
+// Función principal
+char **letterCombinations(const char *digits, int *returnSize) {
+    *returnSize = 0;
+    if (digits == NULL || strlen(digits) == 0) {
+        return NULL;
+    }
+
+    int total_combinations = 1;
+    for (int i = 0; i < strlen(digits); i++) {
+        total_combinations *= strlen(letters[digits[i] - '0']);
+    }
+
+    char **result = (char **)malloc(total_combinations * sizeof(char *));
+    char *current = (char *)malloc((strlen(digits) + 1) * sizeof(char));
+
+    backtrack(result, current, digits, 0, returnSize);
+
+    free(current);
+    return result;
+}
+
+// Función para imprimir las combinaciones
+void printCombinations(char **combinations, int size) {
+    printf("[");
+    for (int i = 0; i < size; i++) {
+        printf("\"%s\"", combinations[i]);
+        if (i < size - 1) {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
+
+// Función principal para probar el código
+int main() {
+    const char *digits = "23";
+    int returnSize;
+    char **combinations = letterCombinations(digits, &returnSize);
+
+    printCombinations(combinations, returnSize);
+
+    // Liberar memoria
+    for (int i = 0; i < returnSize; i++) {
+        free(combinations[i]);
+    }
+    free(combinations);
+
+    return 0;
+}
